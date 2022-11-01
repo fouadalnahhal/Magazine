@@ -69,14 +69,35 @@ namespace Magazine.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Returned>> SubmitOrder(Customer customer, PurchaseOrderH purchaseOrderH)
+        public async Task<ActionResult<Obj>> SubmitOrder(Customer customer, PurchaseOrderH purchaseOrderH)
         {
+            try
+            {
+                if (_context.Customer.SingleOrDefault(c => c.PhoneNumber == customer.PhoneNumber) == null)
+                {
+                    _context.Customer.Add(customer);
+                    _context.SaveChangesAsync();
+                }
+                purchaseOrderH.Customer = customer;
+                _context.PurchaseOrderH.Add(purchaseOrderH);
+                _context.SaveChangesAsync();
 
-            Returned returned = new Returned();
-            return returned;
+                foreach (var item in purchaseOrderH.PurchaseOrderDs)
+                {
+                    item.PurchaseOrderHID = purchaseOrderH.ID;
+                    _context.PurchaseOrderD.Add(item);
+                }
+
+                return new Obj() { IsSuccess = true, MSG = "Success" };
+            }
+            catch (Exception ex)
+            {
+                return new Obj() { IsSuccess = false, MSG = ex.Message };
+                throw;
+            }
         }
 
-        public class Returned
+        public class Obj
         {
             public bool IsSuccess { get; set; }
             public string MSG { get; set; }
