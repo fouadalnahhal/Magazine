@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Magazine.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class MagazineController : ControllerBase
     {
@@ -17,9 +17,9 @@ namespace Magazine.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<MagazineHead>> GetMerchantIdentity(int magazineId)
+        public async Task<ActionResult<MagazineHead>> GetMerchantIdentity(int id)
         {
-            var magazineHead = await _context.MagazineHead.FindAsync(magazineId);
+            var magazineHead = await _context.MagazineHead.FindAsync(id);
 
             if (magazineHead == null)
             {
@@ -30,9 +30,9 @@ namespace Magazine.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<MagazineSlider>>> GetSliderImages(int magazineId)
+        public async Task<ActionResult<IEnumerable<MagazineSlider>>> GetSliderImages(int id)
         {
-            var magazineHead = await _context.MagazineHead.FindAsync(magazineId);
+            var magazineHead = await _context.MagazineHead.FindAsync(id);
 
             if (magazineHead == null)
             {
@@ -43,9 +43,9 @@ namespace Magazine.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<MagazineSection>>> GetAllSectionsAndItems(int magazineId)
+        public async Task<ActionResult<IEnumerable<MagazineSection>>> GetAllSectionsAndItems(int id)
         {
-            var magazineHead = await _context.MagazineHead.FindAsync(magazineId);
+            var magazineHead = await _context.MagazineHead.FindAsync(id);
 
             if (magazineHead == null)
             {
@@ -56,9 +56,9 @@ namespace Magazine.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<MagazinePayment>>> GetAllowedPaymentMethods(int magazineId)
+        public async Task<ActionResult<IEnumerable<MagazinePayment>>> GetAllowedPaymentMethods(int id)
         {
-            var magazineHead = await _context.MagazineHead.FindAsync(magazineId);
+            var magazineHead = await _context.MagazineHead.FindAsync(id);
 
             if (magazineHead == null)
             {
@@ -69,8 +69,10 @@ namespace Magazine.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Obj>> SubmitOrder(Customer customer, PurchaseOrderH purchaseOrderH)
+        public async Task<ActionResult<Obj>> SubmitOrder(Order order)
         {
+            var customer = order.Customer;
+            var purchaseOrderH = order.PurchaseOrderH;
             try
             {
                 if (_context.Customer.SingleOrDefault(c => c.PhoneNumber == customer.PhoneNumber) == null)
@@ -95,6 +97,11 @@ namespace Magazine.Controllers
                 return new Obj() { IsSuccess = false, MSG = ex.Message };
                 throw;
             }
+        }
+        public class Order
+        {
+            public Customer Customer { get; set; }
+            public PurchaseOrderH PurchaseOrderH { get; set; }
         }
 
         public class Obj

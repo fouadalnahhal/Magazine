@@ -10,7 +10,7 @@ namespace Magazine.Models
         public string AccountNumber { get; set; }
 
         [MaxLength(10)]
-        public string Titel { get; set; }
+        public string Title { get; set; }
 
         [MaxLength(50)]
         public string FirstName { get; set; }
